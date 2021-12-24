@@ -1,32 +1,26 @@
 import { useState } from "react";
 import people from "../store/people.json";
-import MultiRangeSlider from "../components/MultiRangeSlider";
+import MultiRangeSlider from "../components/MultiRangeSlider/index";
+import { unformatter, formatter } from "../utils";
 
-const unformatter = (str) => {
-  str = str.replaceAll("$", "");
-  str = str.replaceAll(",", "");
-  return parseInt(str);
-};
-
-const formatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
-
-
-
-const Person = ({ name, balance }) => {
+const Person = ({ name, balance, email, phone }) => {
   return (
-    <div className="flex bg-green-400 text-white p-2">
-      <div>{name}</div>
-      <div>{balance}</div>
+    <div className="bg-light-200 shadow-lg flex justify-between items-center p-2">
+      <div>
+        <div className="text-xl font-md pb-1">{name}</div>
+        <div className="text-sm">{phone}</div>
+        <div className="text-sm">{email}</div>
+      </div>
+      <div>
+        <div className="text-md font-semibold">{balance}</div>
+      </div>
     </div>
   );
 };
 
 export default () => {
   const [minRange, setMinRange] = useState(1000);
-  const [maxRange, setMaxRange] = useState(2000);
+  const [maxRange, setMaxRange] = useState(4000);
 
   const filteredPeople = people.filter((p) => {
     return (
@@ -35,24 +29,43 @@ export default () => {
   });
 
   return (
-    <div>
-      <div className="sticky top-0 p-2 bg-white ">
+    <div className="container mx-auto max-w-2xl p-2">
+      <div className="sticky top-0 px-2 bg-white">
         <MultiRangeSlider
-          minChange={(v) => setMinRange(v)}
-          maxChange={(v) => setMaxRange(v)}
-          min="1000"
-          max="4000"
-          step="10"
+          min={1000}
+          max={4000}
+          onChange={({ min, max }) => {
+            setMinRange(min);
+            setMaxRange(max);
+          }}
         />
         <div className="flex justify-between">
-          <div>min: {formatter.format(minRange)}</div>
-          <div>max: {formatter.format(maxRange)}</div>
+          <div className="flex space-x-2">
+            <div>Min: </div>
+            <div className="text-green-500 font-md">
+              {formatter.format(minRange)}
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            <div>Max: </div>
+            <div className="text-green-500 font-md">
+              {formatter.format(maxRange)}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-4 pt-2">
         {filteredPeople.map((p) => {
-          return <Person name={p.name} balance={p.balance} key={p._id} />;
+          return (
+            <Person
+              name={p.name}
+              balance={p.balance}
+              email={p.email}
+              phone={p.phone}
+              key={p._id}
+            />
+          );
         })}
       </div>
     </div>
